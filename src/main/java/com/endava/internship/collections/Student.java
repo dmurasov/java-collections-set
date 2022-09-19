@@ -52,10 +52,7 @@ public class Student //TODO consider implementing any interfaces necessary for y
 
     @Override
     public String toString() {
-        return "Student{" +
-                "name='" + name + '\'' +
-                ", dateOfBirth=" + dateOfBirth +
-                ", details='" + details + '\'' +
-                '}';
+        return "Student{" + "name='" + name + '\'' + ", dateOfBirth=" + dateOfBirth +
+                ", details='" + details + '\'' + '}';
     }
 }
