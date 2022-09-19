@@ -4,9 +4,22 @@ import java.util.*;
 import java.lang.reflect.Array;
 
 public class StudentSet implements Set<Student> {
-    private Entry<Student>[] buckets;
-    private int capacity, size;
+
     private static final int INITIAL_CAPACITY = 16;
+
+    private Entry<Student>[] buckets;
+
+    private int capacity, size;
+
+    public StudentSet(int capacity){
+        this.buckets = new Entry[capacity];
+        setCapacity(capacity);
+    }
+
+    public StudentSet(){
+        this(INITIAL_CAPACITY);
+    }
+
     @Override
     public int size() {
         return this.size;
@@ -19,7 +32,7 @@ public class StudentSet implements Set<Student> {
 
     @Override
     public boolean contains(Object o) {
-        int i = o == null ? 0 : hash(o.hashCode());
+        int i = hash(o);
         Entry<Student> bucket = buckets[i];
 
         while (bucket != null) {
@@ -93,7 +106,7 @@ public class StudentSet implements Set<Student> {
     public boolean add(Student student){
         resizeHashSet();
 
-        int i = student == null ? 0 : hash(student.hashCode());
+        int i = hash(student);
         Entry<Student> bucket = buckets[i];
 
         //check if element is already in set with cycle
@@ -129,12 +142,7 @@ public class StudentSet implements Set<Student> {
 
     @Override
     public boolean remove(Object o) {
-        int i;
-        if(o == null) {
-            i = 0;
-        }else{
-            i = hash(o.hashCode());
-        }
+        int i = hash(o);
         Entry<Student> bucket = buckets[i];
         Entry<Student> previous = null;
 
@@ -165,8 +173,9 @@ public class StudentSet implements Set<Student> {
     public void clear() {
         if (buckets != null && size > 0) {
             this.size = 0;
-            for (int i = 0; i < buckets.length; ++i)
+            for (int i = 0; i < buckets.length; ++i) {
                 buckets[i] = null;
+            }
         }
     }
 
@@ -222,7 +231,6 @@ public class StudentSet implements Set<Student> {
         while (stIterator.hasNext()){
             Student st = (Student)stIterator.next();
             if (collection.contains(st)){
-                System.out.println(st);
                 this.remove(st);
                 removed = true;
             }
@@ -231,8 +239,12 @@ public class StudentSet implements Set<Student> {
     }
 
     //hash function
-    private int hash(int hashCode) {
-        int index = hashCode;
+
+    private int hash(Object o) {
+        if(o == null){
+            return 0;
+        }
+        int index = o.hashCode();
         if (index < 0) {
             index = -index;
         }
@@ -241,13 +253,6 @@ public class StudentSet implements Set<Student> {
 
     private void setCapacity(int capacity){
         this.capacity = capacity;
-    }
-    public StudentSet(int capacity){
-        this.buckets = new Entry[capacity];
-        setCapacity(capacity);
-    }
-    public StudentSet(){
-        this(INITIAL_CAPACITY);
     }
 
     private void resizeHashSet(){
