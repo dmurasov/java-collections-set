@@ -8,8 +8,13 @@ import java.util.*;
 import java.time.LocalDate;
 
 public class StudentSetTest {
-    StudentSet set;
+    private StudentSet set;
 
+    private final static Student st1 = new Student("John", LocalDate.of(2000, 5, 12), "");
+
+    private final static Student st2 = new Student("David", LocalDate.of(2001, 6, 20), "");
+
+    private final static Student st3 = new Student("Dmitrii", LocalDate.of(1996, 10, 16), "");
 
     @BeforeEach
     void setUpStudentSet(){
@@ -18,24 +23,32 @@ public class StudentSetTest {
 
     @Test
     void addElementShouldReturnTrue(){
-        Student st = new Student("John Doe", LocalDate.of(2000, 5, 12), "");
-        assertTrue(set.add(st));
+        addElementsToSet(set, st1);
+
+        assertAll(
+                () -> assertThat(set).isNotEmpty(),
+                () -> assertThat(set).hasSize(1)
+        );
     }
 
     @Test
     void addDuplicatedNullToSetShouldAllowASingleNullElement(){
-        set.add(null);
-        set.add(null);
-        assertThat(set).containsNull();
+        assertTrue(set.add(null));
+        assertFalse(set.add(null));
+
+        assertAll(
+                () -> assertThat(set).hasSize(1),
+                () -> assertThat(set).containsNull()
+        );
     }
 
     @Test
     void addDublicatedObjectToSetShouldNotBeAdded(){
-        Student st = new Student("John Doe", LocalDate.of(2000, 5, 12), "");
-        set.add(st);
+        addElementsToSet(set, st1);
+
         assertAll(
-                () -> assertFalse(set.add(st)),
-                () -> assertThat(set).containsOnlyOnce(st)
+                () -> assertFalse(set.add(st1)),
+                () -> assertThat(set).containsOnlyOnce(st1)
         );
     }
 
@@ -56,20 +69,18 @@ public class StudentSetTest {
 
     @Test
     void ifElementIsContainedItShouldReturnTrue(){
-        Student st = new Student("John Doe", LocalDate.of(2000, 5, 12), "");
-        set.add(st);
-        assertTrue(set.contains(st));
+        addElementsToSet(set, st1);
+        assertTrue(set.contains(st1));
     }
 
     @Test
     void ifElementIsNotContainedItShouldReturnFalse(){
-        Student st = new Student("John Doe", LocalDate.of(2000, 5, 12), "");
-        assertFalse(set.contains(st));
+        assertFalse(set.contains(st1));
     }
 
     @Test
     void setShouldBeClearedIfContainsElements(){
-        set.add(new Student("John Doe", LocalDate.of(2000, 5, 12), ""));
+        addElementsToSet(set, st1);
         set.clear();
 
         assertAll(
@@ -80,19 +91,17 @@ public class StudentSetTest {
 
     @Test
     void elementShoulBeRemovedFromSetIfItIsContained(){
-        Student st = new Student("John Doe", LocalDate.of(2000, 5, 12), "");
-        set.add(st);
+        assertTrue(set.add(st1));
 
         assertAll(
-                () -> assertTrue(set.remove(st)),
-                () -> assertTrue(!set.contains(st))
+                () -> assertTrue(set.remove(st1)),
+                () -> assertTrue(!set.contains(st1))
         );
     }
 
     @Test
     void elementShouldBeNotRemovedFromSetIfItIsNotContained(){
-        Student st = new Student("John Doe", LocalDate.of(2000, 5, 12), "");
-        assertFalse(set.remove(st));
+        assertFalse(set.remove(st1));
     }
 
     @Test
@@ -102,17 +111,13 @@ public class StudentSetTest {
 
     @Test
     void nullElementShouldBeRemovedIfItIsContained(){
-        set.add(null);
-
-        set.remove(null);
+        assertTrue(set.add(null));
+        assertTrue(set.remove(null));
         assertFalse(set.contains(null));
     }
 
     @Test
     void methodShouldReturnIteratorThatContainsNotNullElementsFromTheSet(){
-        Student st1 = new Student("John Doe", LocalDate.of(2000, 5, 12), "");
-        Student st2 = new Student("David", LocalDate.of(2001, 6, 20), "");
-
         addElementsToSet(set, st1, st2);
         Iterator it = set.iterator();
         while(it.hasNext()) {
@@ -122,25 +127,18 @@ public class StudentSetTest {
 
     @Test
     void elementsFromOtherCollectionShouldBeAddedInExactlyOrder(){
-        Student st1 = new Student("John Doe", LocalDate.of(2000, 5, 12), "");
-        Student st2 = new Student("David", LocalDate.of(2001, 6, 20), "");
-
         List<Student> list = Arrays.asList(st1, null, st2);
 
-        set.addAll(list);
+        assertTrue(set.addAll(list));
         assertThat(set).containsExactlyInAnyOrder(st1, null, st2);
     }
 
     @Test
     void mustRemoveAllElementsContainedInTheOtherCollection(){
-        Student st1 = new Student("John Doe", LocalDate.of(2000, 5, 12), "");
-        Student st2 = new Student("David", LocalDate.of(2001, 6, 20), "");
-
         addElementsToSet(set, st1, st2);
-
         List<Student> list = Arrays.asList(st1, null, st2);
 
-        set.removeAll(list);
+        assertTrue(set.removeAll(list));
         assertThat(set).doesNotContainAnyElementsOf(list);
     }
 
@@ -151,11 +149,7 @@ public class StudentSetTest {
 
     @Test
     void shouldReturnTrueIfAllElementsFromOtherCollectionIsContainedInSetInAnyPosition(){
-        Student st1 = new Student("John Doe", LocalDate.of(2000, 5, 12), "");
-        Student st2 = new Student("David", LocalDate.of(2001, 6, 20), "");
-
         addElementsToSet(set, st1, st2, null);
-
         List<Student> list = Arrays.asList(st1, null);
 
         assertTrue(set.containsAll(list));
@@ -168,11 +162,7 @@ public class StudentSetTest {
 
     @Test
     void mustRetainAllElementsContainedInTheOtherCollection(){
-        Student st1 = new Student("John Doe", LocalDate.of(2000, 5, 12), "");
-        Student st2 = new Student("David", LocalDate.of(2001, 6, 20), "");
-
         addElementsToSet(set, st1, st2, null);
-
         List<Student> list = Arrays.asList(st1, null);
 
         set.retainAll(list);
@@ -181,9 +171,6 @@ public class StudentSetTest {
 
     @Test
     void ifTheArrayIsLargerThanTheCollectionItShouldReturnAnArrayOfTheObjectWithTheSameSize(){
-        Student st1 = new Student("John Doe", LocalDate.of(2000, 5, 12), "");
-        Student st2 = new Student("David", LocalDate.of(2001, 6, 20), "");
-
         addElementsToSet(set, st1, st2, null);
         Student[] students = set.toArray(new Student[5]);
 
@@ -195,9 +182,6 @@ public class StudentSetTest {
 
     @Test
     void ifTheArrayIsSmallerThanTheCollectionItShouldReturnAnArrayOfTheObjectWithTheSameSizeAsSet(){
-        Student st1 = new Student("John Doe", LocalDate.of(2000, 5, 12), "");
-        Student st2 = new Student("David", LocalDate.of(2001, 6, 20), "");
-
         addElementsToSet(set, st1, st2, null);
         Student[] students = set.toArray(new Student[1]);
 
@@ -209,9 +193,6 @@ public class StudentSetTest {
 
     @Test
     void elementsInTheArrayShouldBeInTheSameOrderAsInBuckets(){
-        Student st1 = new Student("John Doe", LocalDate.of(2000, 5, 12), "");
-        Student st2 = new Student("David", LocalDate.of(2001, 6, 20), "");
-
         addElementsToSet(set, null, st1, st2);
         Object[] students = set.toArray();
         Object[] path = new Object[]{null, st2, st1};
@@ -222,20 +203,15 @@ public class StudentSetTest {
     @Test
     void setShouldBeResizedIfSizeIsLargerThenLoadFactor(){
         set = new StudentSet(1);
-
-        Student st1 = new Student("John Doe", LocalDate.of(2000, 5, 12), "");
-        Student st2 = new Student("David", LocalDate.of(2001, 6, 20), "");
-        Student st3 = new Student("Dmitrii", LocalDate.of(1996, 10, 16), "");
-
         addElementsToSet(set, st1, st2, st3);
 
         assertThat(set).hasSize(3);
     }
 
 
-    private void addElementsToSet(StudentSet set, Student ... students){
+    private void addElementsToSet(StudentSet set, final Student ... students){
         for(Student s : students){
-            set.add(s);
+            assertTrue(set.add(s));
         }
     }
 }
